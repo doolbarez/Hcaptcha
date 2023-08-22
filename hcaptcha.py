@@ -6,6 +6,7 @@ from fake_useragent import UserAgent
 import time
 import os
 from twocaptcha import TwoCaptcha
+from proxy_auth_data import login, password
 
 #2CaptchaAPI
 def solveHCaptcha():
@@ -45,12 +46,21 @@ driver.get("https://lumtest.com/myip.json")
 time.sleep(2)
 driver.get("https://accounts.hcaptcha.com/demo")
 
-field = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "#ignored1")))
+# Кастомные селекторы
+class CustomSelectors:
+    @staticmethod
+    def by_iframe_title(title_value):
+        return By.CSS_SELECTOR, f'iframe[title="{title_value}"]'
+    def by_input_aria_label(label_value):
+        return By.CSS_SELECTOR, f'input[aria-label="{label_value}"]'
+
+
+field = WebDriverWait(driver, 10).until(EC.presence_of_element_located(CustomSelectors.by_input_aria_label('Form Field (optional)')))
 field.send_keys("Example")
 
 time.sleep(3)
-iframe = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "#hcaptcha-demo > iframe")))
 
+iframe = WebDriverWait(driver, 10 ).until(EC.presence_of_element_located(CustomSelectors.by_iframe_title('Widget containing checkbox for hCaptcha security challenge')))
 result = solveHCaptcha()
 
 if result:
