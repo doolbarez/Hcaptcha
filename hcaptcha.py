@@ -1,4 +1,4 @@
-from selenium import webdriver
+from seleniumwire import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -33,18 +33,24 @@ options = webdriver.ChromeOptions()
 options.add_experimental_option('useAutomationExtension', False)
 UserAgent = UserAgent()
 options.add_argument(f"user-agent={UserAgent.random}")
-#options.add_argument("--proxy-server=34.101.245.121:80")
+options = {
+'proxy': {'http': 'http://brd-customer-hl_ce63cbe3-zone-data_center:47go741wi9a6@brd.superproxy.io:22225',
+'https': 'http://brd-customer-hl_ce63cbe3-zone-data_center:47go741wi9a6@brd.superproxy.io:22225'},
+}
 
 # Запуск веб-драйвера с настройками прокси
-driver = webdriver.Chrome(options=options)
+driver = webdriver.Chrome(seleniumwire_options=options)
 # Открытие страницы
+driver.get("https://lumtest.com/myip.json")
+time.sleep(2)
 driver.get("https://accounts.hcaptcha.com/demo")
 
-field = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "/html/body/div[5]/form/fieldset/ul/li[1]/input")))
+field = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "#ignored1")))
 field.send_keys("Example")
 
 time.sleep(3)
-iframe = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "/html/body/div[5]/form/fieldset/ul/li[2]/div/div/iframe")))
+iframe = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "#hcaptcha-demo > iframe")))
+
 result = solveHCaptcha()
 
 if result:
